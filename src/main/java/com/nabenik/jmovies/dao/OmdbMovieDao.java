@@ -2,6 +2,7 @@ package com.nabenik.jmovies.dao;
 
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.enterprise.concurrent.ManagedExecutorService;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  *
@@ -19,21 +21,29 @@ import javax.ws.rs.core.MediaType;
 @Stateless
 public class OmdbMovieDao {
     
-    @Inject
+    @Inject @LookupMovie
     Event<String> lookupMovie;
     
     @Resource
     ManagedExecutorService threadPool;
-
     
-    private static final String OMDB_KEY = "380e56c9";
-    private static final String OMDB_BASE_URL = "http://www.omdbapi.com/?apikey=" + OMDB_KEY;
+    @Inject
+    @ConfigProperty(name = "omdb.key", defaultValue = "999")
+    String omdbKey;
+    
+    String omdbBaseUrl;
+    
+    @PostConstruct
+    public void init(){
+        omdbBaseUrl = "http://www.omdbapi.com/?apikey=" + omdbKey;
+    }
+    
     
     public CompletionStage<String> findActors(String imdb){
         
         lookupMovie.fireAsync(imdb, NotificationOptions.ofExecutor(threadPool));
         
-        String requestUrl = OMDB_BASE_URL + "&i=" + imdb;
+        String requestUrl = omdbBaseUrl + "&i=" + imdb;
         
         //Intentar buscar los detalles
         //Parametrizamos el cliente
