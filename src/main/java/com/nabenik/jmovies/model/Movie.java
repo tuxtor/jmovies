@@ -9,8 +9,10 @@ import java.io.Serializable;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
+@XmlRootElement
 public class Movie implements Serializable {
 
 	@Id
