@@ -6,6 +6,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.io.Serializable;
+import javax.json.bind.annotation.JsonbNillable;
+import javax.json.bind.annotation.JsonbNumberFormat;
+import javax.json.bind.annotation.JsonbProperty;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +29,7 @@ public class Movie implements Serializable {
 
 	@Column
 	@NotNull
+        @JsonbProperty("nombre-pelicula")
 	private String nombre;
 
 	@Column
@@ -34,6 +38,19 @@ public class Movie implements Serializable {
 
 	@Column
 	private String imdb;
+        
+        @Column
+        @JsonbProperty("precio-publico")
+        @JsonbNumberFormat("#0.00")
+	private Double precioVenta;
+
+        public Double getPrecioVenta() {
+            return precioVenta;
+        }
+
+        public void setPrecioVenta(Double precioVenta) {
+            this.precioVenta = precioVenta;
+        }
 
 	public Long getId() {
 		return id;
