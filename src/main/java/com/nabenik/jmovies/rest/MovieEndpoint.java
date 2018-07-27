@@ -18,7 +18,13 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import com.nabenik.jmovies.dao.MovieDao;
+import com.nabenik.jmovies.dao.OmdbMovieDao;
 import com.nabenik.jmovies.model.Movie;
+import java.io.StringReader;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.bind.JsonbBuilder;
 
 @RequestScoped
 @Path("/movies")
@@ -40,7 +46,6 @@ public class MovieEndpoint {
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	public Response findById(@PathParam("id") final Long id) {
-		//TODO: retrieve the movie 
 		Movie movie = movieDao.findById(id);
 		if (movie == null) {
 			return Response.status(Status.NOT_FOUND).build();
@@ -68,5 +73,33 @@ public class MovieEndpoint {
 		movieDao.deleteById(id);
 		return Response.noContent().build();
 	}
+        
+        @GET
+	@Path("/with-actors/{id:[0-9][0-9]*}")
+	public Response findWithActors(@PathParam("id") final Long id) {
+		Movie movie = movieDao.findById(id);
+		if (movie == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+                
+		return Response.ok(createMovieWithActor(movie)).build();
+	}
+        
+        private String createMovieWithActor(Movie movie){
+            
+            //To json
+            String result = JsonbBuilder.create().toJson(movie);
+             
+            JsonReader jsonReader = Json.createReader(new StringReader(result));
+            JsonObject jobj = jsonReader.readObject();       
+            
+            //Json-p Patch
+            jobj = Json.createPatchBuilder()
+	      .add("/actores", "mafalda")
+	      .build()
+	      .apply(jobj);
+            
+            return jobj.toString();
+        }
 
 }
