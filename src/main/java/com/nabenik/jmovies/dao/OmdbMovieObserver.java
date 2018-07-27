@@ -2,7 +2,7 @@ package com.nabenik.jmovies.dao;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.enterprise.event.Observes;
+import javax.enterprise.event.ObservesAsync;
 import javax.inject.Named;
 
 /**
@@ -12,7 +12,8 @@ import javax.inject.Named;
 @Named
 public class OmdbMovieObserver {
     
-    public void logMovieLookup(@Observes @LookupMovie String imdb){
+    public void logMovieLookup(@ObservesAsync String imdb){
+        System.out.println("Notificando async");
         try {
             Thread.sleep(5000);
         } catch (InterruptedException ex) {
